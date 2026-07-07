@@ -1,0 +1,287 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id             String        @id @default(cuid())
+  name           String?
+  email          String        @unique
+  emailVerified  DateTime?
+  password       String?       // Hashed password for credentials auth
+  image          String?
+  roleId         String?
+  role           Role?         @relation(fields: [roleId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  
+  accounts      Account[]
+  sessions      Session[]
+  uploads       Upload[]
+  reports       Report[]
+  notifications Notification[]
+  activityLogs  ActivityLog[]
+  apiKeys       ApiKey[]
+  downloads     Download[]
+  auditLogs     AuditLog[]     @relation("UserAuditLogs")
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String
+  type               String
+  provider           String
+  providerAccountId  String
+  refresh_token      String?  @db.Text
+  access_token       String?  @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String?  @db.Text
+  session_state      String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Organization {
+  id               String            @id @default(cuid())
+  name             String
+  logoUrl          String?
+  brandColor       String?           @default("#3b82f6") // Default blue
+  users            User[]
+  uploads          Upload[]
+  reports          Report[]
+  scheduledReports ScheduledReport[]
+  activityLogs     ActivityLog[]
+  apiKeys          ApiKey[]
+  settings         Settings[]
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+}
+
+model Role {
+  id          String       @id @default(cuid())
+  name        String       @unique // Admin, Manager, Employee
+  users       User[]
+  permissions Permission[] @relation("RolePermissions")
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+}
+
+model Permission {
+  id        String   @id @default(cuid())
+  name      String   @unique // e.g. read:reports, write:reports
+  roles     Role[]   @relation("RolePermissions")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Upload {
+  id               String        @id @default(cuid())
+  fileName         String
+  fileUrl          String
+  fileSize         Int
+  status           String        // PENDING, VALIDATING, VALIDATED, CLEANING, CLEANED, FAILED
+  validationErrors String?       @db.Text // JSON string
+  uploadedById     String
+  uploadedBy       User          @relation(fields: [uploadedById], references: [id])
+  organizationId   String?
+  organization     Organization? @relation(fields: [organizationId], references: [id])
+  datasets         Dataset[]
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Dataset {
+  id             String          @id @default(cuid())
+  name           String
+  description    String?
+  uploadId       String
+  upload         Upload          @relation(fields: [uploadId], references: [id], onDelete: Cascade)
+  rawData        String          @db.Text // JSON representation of raw records
+  processedData  ProcessedData?
+  reports        Report[]
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+}
+
+model ProcessedData {
+  id             String   @id @default(cuid())
+  cleanedData    String   @db.Text // JSON representation of cleaned records
+  kpis           String   @db.Text // JSON representation of key performance indicators
+  statistics     String   @db.Text // JSON representation of descriptive stats
+  anomalies      String   @db.Text // JSON representation of detected anomalies
+  datasetId      String   @unique
+  dataset        Dataset  @relation(fields: [datasetId], references: [id], onDelete: Cascade)
+  insights       Insight?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Insight {
+  id               String        @id @default(cuid())
+  executiveSummary String        @db.Text
+  keyFindings      String        @db.Text // JSON array or text
+  trendAnalysis    String        @db.Text
+  recommendations  String        @db.Text // JSON array or text
+  riskAnalysis     String        @db.Text
+  forecast         String        @db.Text
+  businessInsights String        @db.Text
+  generatedBy      String        @default("AI_OPENAI")
+  processedDataId  String        @unique
+  processedData    ProcessedData @relation(fields: [processedDataId], references: [id], onDelete: Cascade)
+  createdAt        DateTime      @default(now())
+}
+
+model Report {
+  id             String        @id @default(cuid())
+  title          String
+  description    String?
+  fileUrl        String?
+  format         String        // PDF, EXCEL, CSV
+  status         String        // PENDING, PROCESSING, COMPLETED, FAILED
+  createdById    String
+  createdBy      User          @relation(fields: [createdById], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  datasetId      String?
+  dataset        Dataset?      @relation(fields: [datasetId], references: [id])
+  charts         Chart[]
+  downloads      Download[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+}
+
+model ReportTemplate {
+  id             String   @id @default(cuid())
+  name           String
+  content        String   @db.Text // Layout and configuration JSON
+  organizationId String?
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+model Chart {
+  id        String   @id @default(cuid())
+  type      String   // BAR, LINE, PIE, AREA, HEATMAP, SCATTER
+  title     String
+  config    String   @db.Text // JSON options
+  data      String   @db.Text // JSON records
+  reportId  String
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+model ScheduledReport {
+  id               String        @id @default(cuid())
+  name             String
+  frequency        String        // DAILY, WEEKLY, MONTHLY, QUARTERLY
+  recipients       String        // Comma-separated or JSON list
+  cronExpression   String
+  lastRun          DateTime?
+  nextRun          DateTime?
+  isActive         Boolean       @default(true)
+  reportTemplateId String?
+  organizationId   String
+  organization     Organization  @relation(fields: [organizationId], references: [id])
+  createdById      String
+  createdAt        DateTime      @default(now())
+  updatedAt        DateTime      @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  title     String
+  message   String
+  type      String   // INFO, SUCCESS, WARNING, ERROR
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+model ActivityLog {
+  id             String        @id @default(cuid())
+  action         String        // LOGIN, UPLOAD, DOWNLOAD, REPORT_GENERATION, USER_ACTION, ADMIN_ACTION
+  details        String?       @db.Text // JSON details
+  userId         String?
+  user           User?         @relation(fields: [userId], references: [id])
+  organizationId String?
+  organization   Organization? @relation(fields: [organizationId], references: [id])
+  ipAddress      String?
+  createdAt      DateTime      @default(now())
+}
+
+model ApiKey {
+  id             String        @id @default(cuid())
+  keyHash        String        @unique
+  name           String
+  scopes         String        // JSON list of permissions allowed
+  userId         String
+  user           User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  organizationId String
+  organization   Organization  @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  expiresAt      DateTime?
+  createdAt      DateTime      @default(now())
+}
+
+model Settings {
+  id                String       @id @default(cuid())
+  organizationId    String       @unique
+  organization      Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  darkModeEnabled   Boolean      @default(true)
+  defaultTemplateId String?
+  emailConfig       String?      @db.Text // JSON email configs
+  aiConfig          String?      @db.Text // JSON AI config
+  storageSettings   String?      @db.Text // JSON storage settings
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Download {
+  id           String   @id @default(cuid())
+  reportId     String
+  report       Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  downloadedAt DateTime @default(now())
+  ipAddress    String?
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  action       String   // e.g. USER_UPDATE, DATA_DELETE
+  targetType   String   // e.g. User, Organization, Upload
+  targetId     String?
+  details      String?  @db.Text // JSON description of state change
+  performedById String
+  performedBy   User     @relation("UserAuditLogs", fields: [performedById], references: [id])
+  createdAt    DateTime @default(now())
+}

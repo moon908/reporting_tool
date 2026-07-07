@@ -21,8 +21,12 @@ function createMockPrisma() {
             if (modelProp.includes("findMany")) return [];
             if (modelProp.includes("findFirst")) return null;
             if (modelProp.includes("findUnique")) return null;
-            if (modelProp.includes("create")) return {};
-            if (modelProp.includes("update")) return {};
+            if (modelProp.includes("create")) {
+              return { id: "demo-" + Math.random().toString(36).substring(2, 9) };
+            }
+            if (modelProp.includes("update")) {
+              return { id: "demo-" + Math.random().toString(36).substring(2, 9) };
+            }
             if (modelProp.includes("delete")) return {};
             if (modelProp.includes("aggregate")) return { _sum: { fileSize: 0 } };
             return null;

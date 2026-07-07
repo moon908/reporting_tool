@@ -77,14 +77,14 @@ export default async function AdminPage() {
   } catch (err) {
     isDemo = true;
     mappedUsers = [
-      { id: "mock-1", name: "Acme Admin", email: "admin@acme.com", createdAt: new Date(), role: { name: "Admin" } },
-      { id: "mock-2", name: "Acme Manager", email: "manager@acme.com", createdAt: new Date(), role: { name: "Manager" } },
-      { id: "mock-3", name: "Acme Employee", email: "employee@acme.com", createdAt: new Date(), role: { name: "Employee" } },
+      { id: "mock-1", name: "Spectra Admin", email: "admin@spectra.com", createdAt: new Date(), role: { name: "Admin" } },
+      { id: "mock-2", name: "Spectra Manager", email: "manager@spectra.com", createdAt: new Date(), role: { name: "Manager" } },
+      { id: "mock-3", name: "Spectra Employee", email: "employee@spectra.com", createdAt: new Date(), role: { name: "Employee" } },
     ];
 
     mappedLogs = [
-      { id: "log-1", action: "REPORT_GENERATION", details: '{"reportId":"demo-1"}', createdAt: new Date(), user: { name: "Acme Admin", email: "admin@acme.com" } },
-      { id: "log-2", action: "UPLOAD", details: '{"fileName":"dataset.csv"}', createdAt: new Date(Date.now() - 3600000), user: { name: "Acme Admin", email: "admin@acme.com" } },
+      { id: "log-1", action: "REPORT_GENERATION", details: '{"reportId":"demo-1"}', createdAt: new Date(), user: { name: "Spectra Admin", email: "admin@spectra.com" } },
+      { id: "log-2", action: "UPLOAD", details: '{"fileName":"dataset.csv"}', createdAt: new Date(Date.now() - 3600000), user: { name: "Spectra Admin", email: "admin@spectra.com" } },
     ];
   }
 

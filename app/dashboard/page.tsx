@@ -107,14 +107,14 @@ export default async function DashboardPage() {
     storageUsageFormatted = "24.5 MiB";
 
     recentActivities = [
-      { id: "1", action: "REPORT_GENERATION", details: '{"reportId":"rep-1"}', createdAt: new Date(), user: { name: "Acme Admin" } },
-      { id: "2", action: "UPLOAD", details: '{"fileName":"sales_q2.csv"}', createdAt: new Date(Date.now() - 3600000), user: { name: "Acme Admin" } },
-      { id: "3", action: "LOGIN", details: null, createdAt: new Date(Date.now() - 7200000), user: { name: "Acme Admin" } },
+      { id: "1", action: "REPORT_GENERATION", details: '{"reportId":"rep-1"}', createdAt: new Date(), user: { name: "Spectra Admin" } },
+      { id: "2", action: "UPLOAD", details: '{"fileName":"sales_q2.csv"}', createdAt: new Date(Date.now() - 3600000), user: { name: "Spectra Admin" } },
+      { id: "3", action: "LOGIN", details: null, createdAt: new Date(Date.now() - 7200000), user: { name: "Spectra Admin" } },
     ];
 
     recentReports = [
-      { id: "demo-1", title: "Sales Q2 Progress Summary", createdAt: new Date(), createdBy: { name: "Acme Admin" } },
-      { id: "demo-2", title: "Marketing Campaign Conversion Statistics", createdAt: new Date(Date.now() - 86400000), createdBy: { name: "Acme Admin" } },
+      { id: "demo-1", title: "Sales Q2 Progress Summary", createdAt: new Date(), createdBy: { name: "Spectra Admin" } },
+      { id: "demo-2", title: "Marketing Campaign Conversion Statistics", createdAt: new Date(Date.now() - 86400000), createdBy: { name: "Spectra Admin" } },
     ];
 
     statusData = [

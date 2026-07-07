@@ -29,7 +29,7 @@ export default async function ReportDetailsPage({ params }: ReportDetailsPagePro
       title: "Sales Q2 Progress Summary",
       description: "Automated business performance analysis (Simulation Mode)",
       createdAt: new Date(),
-      createdBy: { name: "Acme Admin", email: "admin@acme.com" },
+      createdBy: { name: "Spectra Admin", email: "admin@spectra.com" },
       charts: [
         {
           id: "chart-1",
@@ -127,8 +127,8 @@ export default async function ReportDetailsPage({ params }: ReportDetailsPagePro
   const castedReport: any = {
     ...report,
     organization: {
-      name: "Acme Analytics",
-      brandColor: "#3b82f6",
+      name: "Spectra Reports",
+      brandColor: "#6366f1",
     },
   };
 

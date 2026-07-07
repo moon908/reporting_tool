@@ -12,7 +12,7 @@ export default async function SettingsPage() {
   }
 
   const orgId = session.user.organizationId;
-  let org = { name: "Acme Analytics", brandColor: "#3b82f6" };
+  let org = { name: "Spectra Reports", brandColor: "#6366f1" };
   let mappedKeys: any[] = [];
   let isDemo = false;
 
@@ -45,9 +45,9 @@ export default async function SettingsPage() {
     mappedKeys = [
       {
         id: "demo-key-1",
-        name: "Acme Global Ingest API Access",
+        name: "Spectra Global Ingest API Access",
         createdAt: new Date(Date.now() - 5 * 86400000),
-        user: { name: "Acme Admin", email: "admin@acme.com" },
+        user: { name: "Spectra Admin", email: "admin@spectra.com" },
       },
     ];
   }

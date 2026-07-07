@@ -3,7 +3,7 @@ export const auth = async () => {
   return {
     user: {
       id: "mock-user-id",
-      name: "Acme Admin (Bypass)",
+      name: "Spectra Admin",
       email: "admin@acme.com",
       role: "Admin",
       organizationId: "default-org-id",

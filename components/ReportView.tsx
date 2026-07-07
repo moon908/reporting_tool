@@ -78,8 +78,8 @@ export default function ReportView({ report }: ReportViewProps) {
     try {
       const pdfBytes = await ExportService.exportToPDF({
         title: report.title,
-        orgName: report.organization?.name || "Acme Analytics",
-        brandColor: report.organization?.brandColor || "#3b82f6",
+        orgName: report.organization?.name || "Spectra Reports",
+        brandColor: report.organization?.brandColor || "#6366f1",
         summary: insights?.executiveSummary || "N/A",
         keyFindings,
         recommendations,

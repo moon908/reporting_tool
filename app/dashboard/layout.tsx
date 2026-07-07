@@ -52,10 +52,10 @@ export default async function DashboardLayout({
         {/* Brand */}
         <div className="p-6 border-b border-border/30 flex items-center gap-3">
           <div className="h-9 w-9 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold shadow-md shadow-primary/20">
-            AR
+            SR
           </div>
           <div>
-            <h2 className="font-bold text-foreground text-sm leading-none">Acme Analytics</h2>
+            <h2 className="font-bold text-foreground text-sm leading-none">Spectra Reports</h2>
             <span className="text-[10px] text-muted-foreground">Automated Reporting</span>
           </div>
         </div>
@@ -112,9 +112,9 @@ export default async function DashboardLayout({
             </h1>
             <div className="md:hidden flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold">
-                AR
+                SR
               </div>
-              <span className="font-bold text-foreground text-sm">Acme</span>
+              <span className="font-bold text-foreground text-sm">Spectra</span>
             </div>
           </div>
 

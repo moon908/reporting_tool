@@ -37,7 +37,7 @@ export default async function ReportsListPage() {
         description: "Automated business performance analysis (Simulation Mode)",
         format: "PDF",
         createdAt: new Date(),
-        createdBy: { name: "Acme Admin", email: "admin@acme.com" },
+        createdBy: { name: "Spectra Admin", email: "admin@spectra.com" },
         dataset: { name: "Mock Sales Performance Data" },
       },
       {
@@ -46,7 +46,7 @@ export default async function ReportsListPage() {
         description: "Ad spend and conversion funnel metrics (Simulation Mode)",
         format: "PDF",
         createdAt: new Date(Date.now() - 86400000),
-        createdBy: { name: "Acme Admin", email: "admin@acme.com" },
+        createdBy: { name: "Spectra Admin", email: "admin@spectra.com" },
         dataset: { name: "Conversion Data" },
       },
     ];

@@ -10,10 +10,10 @@ export default function AuthLayout({
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 mb-4 text-xl font-bold">
-            AR
+            SR
           </div>
           <h1 className="text-3xl font-extrabold tracking-tight text-foreground">
-            Acme Analytics
+            Spectra Reports
           </h1>
           <p className="text-sm text-muted-foreground mt-2">
             Automated Enterprise Data Analysis & Reporting

@@ -12,12 +12,15 @@ export interface AIInsights {
 }
 
 export class AIService {
-  private static getOpenAIClient(): OpenAI | null {
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (!apiKey || apiKey === "your-openai-api-key" || apiKey.trim() === "") {
+  private static getGroqClient(): OpenAI | null {
+    const apiKey = process.env.GROQ_API_KEY;
+    if (!apiKey || apiKey.trim() === "") {
       return null;
     }
-    return new OpenAI({ apiKey });
+    return new OpenAI({
+      apiKey,
+      baseURL: "https://api.groq.com/openai/v1",
+    });
   }
 
   static async generateInsights(params: {
@@ -27,10 +30,10 @@ export class AIService {
     anomaliesCount: number;
     sampleRows: any[];
   }): Promise<AIInsights> {
-    const openai = this.getOpenAIClient();
+    const groq = this.getGroqClient();
 
-    if (!openai) {
-      console.warn("OPENAI_API_KEY not configured. Falling back to rule-based mock insights.");
+    if (!groq) {
+      console.warn("GROQ_API_KEY not configured. Falling back to rule-based mock insights.");
       return this.generateMockInsights(params);
     }
 
@@ -65,8 +68,8 @@ export class AIService {
         Ensure you only return valid JSON. Do not include markdown code block formatting like \`\`\`json.
       `;
 
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
+      const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
         messages: [{ role: "user", content: prompt }],
         response_format: { type: "json_object" },
         temperature: 0.3,
@@ -83,10 +86,10 @@ export class AIService {
         isMock: false,
       };
     } catch (error) {
-      console.error("Failed to generate AI insights from OpenAI:", error);
+      console.error("Failed to generate AI insights from Groq:", error);
       return this.generateMockInsights({
         ...params,
-        warning: "OpenAI generation failed; displaying rule-based backup insights.",
+        warning: "Groq generation failed; displaying rule-based backup insights.",
       });
     }
   }

@@ -1,4 +1,6 @@
 import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 
 let prismaInstance: any = null;
 
@@ -43,16 +45,21 @@ export const db = new Proxy({} as PrismaClient, {
     if (!prismaInstance) {
       try {
         const dbUrl = process.env.DATABASE_URL;
-        // In Prisma 7, direct construction without adapter/accelerate throws.
-        // We will default to mock unless a real adapter is configured.
+        
+        // If DATABASE_URL is mock or local developer template, use simulation client
         if (!dbUrl || dbUrl.includes("localhost") || dbUrl.includes("username:password") || dbUrl.startsWith("prisma+postgres")) {
-          console.warn("DATABASE_URL is not set to a live remote PostgreSQL server. Using simulation Prisma client.");
+          console.warn("Using simulation Prisma client (no live remote PostgreSQL database configured).");
           prismaInstance = createMockPrisma();
         } else {
-          // If user has set a live remote database, we attempt to instantiate.
-          // Note: In Prisma 7, user must have installed adapter if they intend to connect directly.
-          // If they haven't set up the adapter configuration yet, we fall back gracefully.
-          prismaInstance = new PrismaClient();
+          // Initialize PostgreSQL connection pool and adapter for Prisma 7
+          const pool = new Pool({
+            connectionString: dbUrl,
+            max: 10,
+            idleTimeoutMillis: 30000,
+            connectionTimeoutMillis: 2000,
+          });
+          const adapter = new PrismaPg(pool);
+          prismaInstance = new PrismaClient({ adapter });
         }
       } catch (err) {
         console.warn("Failed to initialize live PrismaClient, falling back to simulation client:", err);

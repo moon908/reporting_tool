@@ -1,7 +1,13 @@
 import { PrismaClient } from "@prisma/client";
+import { Pool } from "pg";
+import { PrismaPg } from "@prisma/adapter-pg";
 import * as bcrypt from "bcryptjs";
 
-const prisma = new PrismaClient();
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
+const adapter = new PrismaPg(pool);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log("Seeding database...");
@@ -97,8 +103,9 @@ async function main() {
       organizationId: defaultOrg.id,
     },
     create: {
+      id: "mock-user-id",
       email: "admin@acme.com",
-      name: "Acme Admin",
+      name: "Spectra Admin",
       password: hashedAdminPassword,
       roleId: roles["Admin"].id,
       organizationId: defaultOrg.id,
@@ -150,4 +157,5 @@ main()
   })
   .finally(async () => {
     await prisma.$disconnect();
+    await pool.end();
   });

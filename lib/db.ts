@@ -56,7 +56,7 @@ export const db = new Proxy({} as PrismaClient, {
             connectionString: dbUrl,
             max: 10,
             idleTimeoutMillis: 30000,
-            connectionTimeoutMillis: 2000,
+            connectionTimeoutMillis: 15000,
           });
           const adapter = new PrismaPg(pool);
           prismaInstance = new PrismaClient({ adapter });

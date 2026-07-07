@@ -295,7 +295,7 @@ function parseXML(text: string): any[] {
 
   while ((match = rowRegex.exec(text)) !== null) {
     const rowContent = match[1];
-    const fieldRegex = /<([^/s>]+)(?:/s+[^>]*)?>([^<]*)<\/\1>/g;
+    const fieldRegex = /<([^\s>]+)(?:\s+[^>]*)?>([^<]*)<\/\1>/g;
     let fieldMatch;
     const rowObj: any = {};
     while ((fieldMatch = fieldRegex.exec(rowContent)) !== null) {

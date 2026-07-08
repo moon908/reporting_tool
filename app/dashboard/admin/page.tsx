@@ -57,7 +57,7 @@ export default async function AdminPage() {
     const logs = await listActivityLogsAction();
     const liveHealth = await getSystemHealthAction();
 
-    mappedUsers = users.map((u) => ({
+    mappedUsers = users.map((u: any) => ({
       id: u.id,
       name: u.name,
       email: u.email,
@@ -65,7 +65,7 @@ export default async function AdminPage() {
       role: u.role,
     }));
 
-    mappedLogs = logs.map((l) => ({
+    mappedLogs = logs.map((l: any) => ({
       id: l.id,
       action: l.action,
       details: l.details,

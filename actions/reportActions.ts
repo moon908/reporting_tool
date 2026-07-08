@@ -144,7 +144,7 @@ export async function uploadAndProcessFileAction(params: {
         const primaryKey = numericKeys[0];
         const secondaryKey = numericKeys[1] || primaryKey;
 
-        const chartSlice = cleanedRows.slice(0, 15).map((row, idx) => ({
+        const chartSlice = cleanedRows.slice(0, 15).map((row: any, idx: number) => ({
           label: row.name || row.title || row.date || `Row ${idx + 1}`,
           value1: row[primaryKey] || 0,
           value2: row[secondaryKey] || 0,
@@ -270,16 +270,16 @@ export async function getReportDetailsAction(reportId: string) {
 // ==========================================
 
 function parseCSV(text: string): any[] {
-  const lines = text.split(/\r?\n/).filter((l) => l.trim().length > 0);
+  const lines = text.split(/\r?\n/).filter((l: string) => l.trim().length > 0);
   if (lines.length < 2) return [];
 
-  const headers = lines[0].split(",").map((h) => h.trim().replace(/^["']|["']$/g, ""));
+  const headers = lines[0].split(",").map((h: string) => h.trim().replace(/^["']|["']$/g, ""));
   const rows: any[] = [];
 
   for (let i = 1; i < lines.length; i++) {
     const matches = lines[i].match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || lines[i].split(",");
     const row: any = {};
-    headers.forEach((header, colIdx) => {
+    headers.forEach((header: string, colIdx: number) => {
       const val = matches[colIdx] ? matches[colIdx].trim().replace(/^["']|["']$/g, "") : "";
       row[header] = val;
     });

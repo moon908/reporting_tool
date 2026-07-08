@@ -83,7 +83,7 @@ export default async function SchedulesPage() {
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {schedules.map((sched) => (
+                  {schedules.map((sched: any) => (
                     <div
                       key={sched.id}
                       className="border border-border/40 rounded-xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-card hover:bg-slate-500/5 duration-200"

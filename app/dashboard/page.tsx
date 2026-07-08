@@ -274,7 +274,7 @@ export default async function DashboardPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {recentReports.map((report) => (
+                    {recentReports.map((report: any) => (
                       <tr key={report.id} className="border-b border-border/20 hover:bg-slate-100/50 dark:hover:bg-slate-900/50">
                         <td className="py-2.5 font-medium truncate max-w-[200px]">{report.title}</td>
                         <td className="py-2.5 text-muted-foreground">

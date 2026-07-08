@@ -34,7 +34,7 @@ export default async function SettingsPage() {
       orderBy: { createdAt: "desc" },
     });
 
-    mappedKeys = keys.map((key) => ({
+    mappedKeys = keys.map((key: any) => ({
       id: key.id,
       name: key.name,
       createdAt: key.createdAt,

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { Suspense, useActionState, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -48,7 +48,7 @@ function LoginContent() {
         setError(result.error);
         setLoading(false);
       }
-    } catch (err: any) {
+    } catch {
       setError("Failed to sign in. Please verify your credentials.");
       setLoading(false);
     }

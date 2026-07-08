@@ -40,7 +40,7 @@ export default async function SettingsPage() {
       createdAt: key.createdAt,
       user: key.user,
     }));
-  } catch (err) {
+  } catch {
     isDemo = true;
     mappedKeys = [
       {

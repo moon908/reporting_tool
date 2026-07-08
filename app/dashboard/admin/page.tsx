@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { listUsersAction, listActivityLogsAction, getSystemHealthAction } from "@/actions/adminActions";
 import AdminView from "@/components/AdminView";
 import { redirect } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
@@ -74,7 +74,7 @@ export default async function AdminPage() {
     }));
 
     health = liveHealth;
-  } catch (err) {
+  } catch {
     isDemo = true;
     mappedUsers = [
       { id: "mock-1", name: "Spectra Admin", email: "admin@spectra.com", createdAt: new Date(), role: { name: "Admin" } },

@@ -1,10 +1,10 @@
 "use client";
 
 import { updateUserRoleAction } from "@/actions/adminActions";
-import { Button } from "@/components/ui/button";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Activity, ShieldAlert, Users } from "lucide-react";
+import { Activity } from "lucide-react";
 import React, { useState } from "react";
 
 interface AdminViewProps {

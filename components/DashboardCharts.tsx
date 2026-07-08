@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 import {
   Area,
   AreaChart,
-  Bar,
-  BarChart,
   Cell,
   Legend,
   Pie,

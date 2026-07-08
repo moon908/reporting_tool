@@ -2,7 +2,7 @@ import { auth } from "@/auth";
 import { getReportDetailsAction } from "@/actions/reportActions";
 import ReportView from "@/components/ReportView";
 import { redirect } from "next/navigation";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { FileWarning } from "lucide-react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";

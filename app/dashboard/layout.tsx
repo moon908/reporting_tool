@@ -11,7 +11,6 @@ import {
   Shield,
   LogOut,
   Bell,
-  User as UserIcon,
 } from "lucide-react";
 import React from "react";
 

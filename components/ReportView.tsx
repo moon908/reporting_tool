@@ -5,13 +5,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExportService } from "@/services/ExportService";
 import { chatWithAIAboutReportAction } from "@/actions/reportActions";
-import { motion } from "framer-motion";
+
 import {
   Download,
   FileSpreadsheet,
-  FileText,
   Sparkles,
-  TrendingUp,
   Send,
   Bot,
   User,
@@ -102,7 +100,7 @@ export default function ReportView({ report }: ReportViewProps) {
           { role: "assistant", content: `Sorry, I encountered an issue: ${result.error || "Unknown error"}` },
         ]);
       }
-    } catch (err: any) {
+    } catch {
       setMessages([
         ...newMessages,
         { role: "assistant", content: "Failed to communicate with AI analyst. Please try again." },
@@ -118,7 +116,7 @@ export default function ReportView({ report }: ReportViewProps) {
 
   const cleanedRows = processedData?.cleanedData ? JSON.parse(processedData.cleanedData) : [];
   const kpis = processedData?.kpis ? JSON.parse(processedData.kpis) : {};
-  const stats = processedData?.statistics ? JSON.parse(processedData.statistics) : {};
+
   const anomalies = processedData?.anomalies ? JSON.parse(processedData.anomalies) : [];
 
   const keyFindings = insights?.keyFindings ? JSON.parse(insights.keyFindings) : [];

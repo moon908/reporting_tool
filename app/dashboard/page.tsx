@@ -3,17 +3,12 @@ import DashboardCharts from "@/components/DashboardCharts";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { db } from "@/lib/db";
 import { formatBytes } from "@/lib/utils";
-import { ActivityLogRepository } from "@/repositories/ActivityLogRepository";
 import {
-  Activity,
   Calendar,
   Database,
-  FileBarChart,
   FileSpreadsheet,
   FileText,
   Sparkles,
-  TrendingUp,
-  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -31,9 +26,7 @@ export default async function DashboardPage() {
   let reportsCount = 0;
   let scheduledCount = 0;
   let uploadsCount = 0;
-  let usersCount = 0;
   let storageUsageFormatted = "0 Bytes";
-  let recentActivities: any[] = [];
   let recentReports: any[] = [];
   let statusData: any[] = [];
   let latestInsight: any = null;
@@ -44,7 +37,7 @@ export default async function DashboardPage() {
     reportsCount = await db.report.count({ where: { organizationId: orgId } });
     scheduledCount = await db.scheduledReport.count({ where: { organizationId: orgId } });
     uploadsCount = await db.upload.count({ where: { organizationId: orgId } });
-    usersCount = await db.user.count({ where: { organizationId: orgId } });
+
 
     const uploadsAggregate = await db.upload.aggregate({
       where: { organizationId: orgId },
@@ -53,12 +46,7 @@ export default async function DashboardPage() {
     const totalStorageBytes = uploadsAggregate._sum.fileSize || 0;
     storageUsageFormatted = formatBytes(totalStorageBytes);
 
-    recentActivities = await db.activityLog.findMany({
-      where: { organizationId: orgId },
-      take: 5,
-      orderBy: { createdAt: "desc" },
-      include: { user: { select: { name: true, email: true } } },
-    });
+
 
     recentReports = await db.report.findMany({
       where: { organizationId: orgId },
@@ -97,20 +85,13 @@ export default async function DashboardPage() {
       orderBy: { createdAt: "desc" },
       include: { processedData: { include: { dataset: true } } },
     });
-  } catch (dbError) {
+  } catch {
     // Database connection failed - use beautiful dashboard simulation fallback
     isDemoDb = true;
     reportsCount = 12;
     scheduledCount = 4;
     uploadsCount = 8;
-    usersCount = 5;
     storageUsageFormatted = "24.5 MiB";
-
-    recentActivities = [
-      { id: "1", action: "REPORT_GENERATION", details: '{"reportId":"rep-1"}', createdAt: new Date(), user: { name: "Spectra Admin" } },
-      { id: "2", action: "UPLOAD", details: '{"fileName":"sales_q2.csv"}', createdAt: new Date(Date.now() - 3600000), user: { name: "Spectra Admin" } },
-      { id: "3", action: "LOGIN", details: null, createdAt: new Date(Date.now() - 7200000), user: { name: "Spectra Admin" } },
-    ];
 
     recentReports = [
       { id: "demo-1", title: "Sales Q2 Progress Summary", createdAt: new Date(), createdBy: { name: "Spectra Admin" } },

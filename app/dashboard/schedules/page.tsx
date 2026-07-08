@@ -23,7 +23,7 @@ export default async function SchedulesPage() {
       where: { organizationId: orgId },
       orderBy: { createdAt: "desc" },
     });
-  } catch (err) {
+  } catch {
     isDemo = true;
     schedules = [
       {

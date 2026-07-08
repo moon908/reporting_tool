@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "framer-motion";
-import { AlertCircle, CheckCircle2, FileSpreadsheet, Loader2, Sparkles, Upload } from "lucide-react";
+
+import { AlertCircle, CheckCircle2, FileSpreadsheet, Sparkles, Upload } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useRef, useState } from "react";
 
@@ -91,7 +91,7 @@ export default function IngestionPage() {
             setPreviewHeaders(Object.keys(items[0]));
             setPreviewRows(items);
           }
-        } catch (err) {}
+        } catch {}
       }
     };
 

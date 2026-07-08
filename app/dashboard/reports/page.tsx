@@ -28,7 +28,7 @@ export default async function ReportsListPage() {
       },
       orderBy: { createdAt: "desc" },
     });
-  } catch (err) {
+  } catch {
     isDemo = true;
     reports = [
       {

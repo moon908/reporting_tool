@@ -325,7 +325,7 @@ export default function ReportView({ report }: ReportViewProps) {
               )}
 
               {/* AI Conversation Block */}
-              <Card className="glass-card border-border/40 shadow-sm flex flex-col h-[400px]">
+              <Card className="glass-card border-border/40 shadow-sm flex flex-col h-[550px]">
                 <CardHeader className="pb-3 border-b border-border/20 flex flex-row items-center gap-2 space-y-0 py-4">
                   <MessageSquare className="h-4 w-4 text-primary" />
                   <div>

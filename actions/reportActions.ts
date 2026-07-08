@@ -310,7 +310,7 @@ function parseXML(text: string): any[] {
 
 async function parseExcel(buffer: Buffer): Promise<any[]> {
   const workbook = new Workbook();
-  await workbook.xlsx.load(buffer);
+  await workbook.xlsx.load(buffer as any);
   const worksheet = workbook.worksheets[0];
   if (!worksheet) return [];
 

@@ -22,7 +22,7 @@ export default async function SettingsPage() {
       where: { id: orgId },
     });
     if (liveOrg) {
-      org = { name: liveOrg.name, brandColor: liveOrg.brandColor };
+      org = { name: liveOrg.name, brandColor: liveOrg.brandColor || "#6366f1" };
     }
 
     // Retrieve active API keys

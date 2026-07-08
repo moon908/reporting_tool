@@ -141,7 +141,7 @@ export default function ReportView({ report }: ReportViewProps) {
         kpis,
       });
 
-      const blob = new Blob([pdfBytes], { type: "application/pdf" });
+      const blob = new Blob([pdfBytes as any], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -164,7 +164,7 @@ export default function ReportView({ report }: ReportViewProps) {
         kpis
       );
 
-      const blob = new Blob([excelBytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const blob = new Blob([excelBytes as any], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -280,130 +280,110 @@ export default function ReportView({ report }: ReportViewProps) {
             </div>
 
             {/* Right Col - Stats & KPIs */}
-            <div className="space-y-6">
-              <Card className="glass-card border-border/40 shadow-sm">
-                <CardHeader>
-                  <CardTitle className="text-sm font-semibold tracking-tight flex items-center gap-2">
-                    <TrendingUp className="h-4 w-4 text-emerald-500" />
-                    Key Performance Indicators
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  {Object.entries(kpis).map(([k, val]: [string, any]) => {
-                    const label = k.replace(/([A-Z])/g, " $1").replace(/^./, (str) => str.toUpperCase());
-                    return (
-                      <div key={k} className="flex justify-between items-center border-b border-border/20 pb-2">
-                        <span className="text-xs text-muted-foreground">{label}</span>
-                        <span className="text-xs font-bold text-foreground">
-                          {typeof val === "number" ? val.toLocaleString() : val}
-                        </span>
+            <div className="relative w-full h-full min-h-[500px] lg:min-h-0">
+              <div className="lg:absolute lg:inset-0 flex flex-col space-y-6">
+                {anomalies.length > 0 && (
+                  <Card className="glass-card border-destructive/20 shadow-sm bg-destructive/5 flex-shrink-0">
+                    <CardHeader>
+                      <CardTitle className="text-sm font-semibold tracking-tight text-destructive">
+                        Anomalous Outliers Detected ({anomalies.length})
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="space-y-2 max-h-40 overflow-y-auto">
+                        {anomalies.map((anom: any, idx: number) => (
+                          <div key={idx} className="text-[10px] text-muted-foreground border-b border-border/10 pb-1">
+                            Row <span className="font-semibold text-foreground">#{anom.rowIndex + 1}</span>:{" "}
+                            <span className="text-destructive font-semibold">{anom.column}</span> is{" "}
+                            <span className="font-bold text-foreground">{anom.value}</span> (Z-score: {anom.zScore})
+                          </div>
+                        ))}
                       </div>
-                    );
-                  })}
-                </CardContent>
-              </Card>
+                    </CardContent>
+                  </Card>
+                )}
 
-              {anomalies.length > 0 && (
-                <Card className="glass-card border-destructive/20 shadow-sm bg-destructive/5">
-                  <CardHeader>
-                    <CardTitle className="text-sm font-semibold tracking-tight text-destructive">
-                      Anomalous Outliers Detected ({anomalies.length})
-                    </CardTitle>
+                {/* AI Conversation Block */}
+                <Card className="glass-card border-border/40 shadow-sm flex flex-col flex-1 h-[500px] lg:h-auto min-h-0">
+                  <CardHeader className="pb-3 border-b border-border/20 flex flex-row items-center gap-2 space-y-0 py-4">
+                    <MessageSquare className="h-4 w-4 text-primary" />
+                    <div>
+                      <CardTitle className="text-sm font-semibold tracking-tight">Spectra AI</CardTitle>
+                      <CardDescription className="text-[10px]">Ask questions about this report</CardDescription>
+                    </div>
                   </CardHeader>
-                  <CardContent>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {anomalies.map((anom: any, idx: number) => (
-                        <div key={idx} className="text-[10px] text-muted-foreground border-b border-border/10 pb-1">
-                          Row <span className="font-semibold text-foreground">#{anom.rowIndex + 1}</span>:{" "}
-                          <span className="text-destructive font-semibold">{anom.column}</span> is{" "}
-                          <span className="font-bold text-foreground">{anom.value}</span> (Z-score: {anom.zScore})
+                  <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+                    {/* Message Container */}
+                    <div
+                      ref={chatScrollRef}
+                      className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin text-xs"
+                    >
+                      {messages.map((msg, idx) => (
+                        <div
+                          key={idx}
+                          className={`flex gap-2.5 max-w-[85%] ${
+                            msg.role === "user" ? "ml-auto flex-row-reverse" : ""
+                          }`}
+                        >
+                          <div
+                            className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                              msg.role === "user"
+                                ? "bg-primary/20 text-primary"
+                                : "bg-slate-800 text-slate-300 border border-border/30"
+                            }`}
+                          >
+                            {msg.role === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                          </div>
+                          <div
+                            className={`p-2.5 rounded-2xl leading-relaxed whitespace-pre-line ${
+                              msg.role === "user"
+                                ? "bg-primary text-primary-foreground rounded-tr-none"
+                                : "bg-slate-900/60 text-muted-foreground border border-border/20 rounded-tl-none"
+                            }`}
+                          >
+                            {msg.content}
+                          </div>
                         </div>
                       ))}
+
+                      {chatLoading && (
+                        <div className="flex gap-2.5 max-w-[85%]">
+                          <div className="h-6 w-6 rounded-full bg-slate-800 text-slate-300 border border-border/30 flex items-center justify-center flex-shrink-0">
+                            <Bot className="h-3 w-3 animate-pulse" />
+                          </div>
+                          <div className="p-2.5 bg-slate-900/60 border border-border/20 rounded-2xl rounded-tl-none flex items-center gap-1.5 text-muted-foreground">
+                            <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                            <span className="text-[10px] animate-pulse">Analyzing report data...</span>
+                          </div>
+                        </div>
+                      )}
                     </div>
+
+                    {/* Input Form */}
+                    <form
+                      onSubmit={handleSendChatMessage}
+                      className="p-3 border-t border-border/20 bg-slate-900/30 flex gap-2 items-center"
+                    >
+                      <input
+                        type="text"
+                        value={chatInput}
+                        onChange={(e) => setChatInput(e.target.value)}
+                        placeholder="Ask me something about the data..."
+                        disabled={chatLoading}
+                        className="flex-1 bg-slate-950/40 border border-border/30 rounded-lg px-3 py-1.5 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/60 disabled:opacity-50"
+                      />
+                      <Button
+                        type="submit"
+                        disabled={!chatInput.trim() || chatLoading}
+                        size="icon"
+                        className="h-8 w-8 rounded-lg flex-shrink-0 bg-primary hover:bg-primary/95 text-primary-foreground"
+                      >
+                        <Send className="h-3.5 w-3.5" />
+                      </Button>
+                    </form>
                   </CardContent>
                 </Card>
-              )}
-
-              {/* AI Conversation Block */}
-              <Card className="glass-card border-border/40 shadow-sm flex flex-col h-[550px]">
-                <CardHeader className="pb-3 border-b border-border/20 flex flex-row items-center gap-2 space-y-0 py-4">
-                  <MessageSquare className="h-4 w-4 text-primary" />
-                  <div>
-                    <CardTitle className="text-sm font-semibold tracking-tight">AI Data Chat</CardTitle>
-                    <CardDescription className="text-[10px]">Ask questions about this report</CardDescription>
-                  </div>
-                </CardHeader>
-                <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-                  {/* Message Container */}
-                  <div
-                    ref={chatScrollRef}
-                    className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin text-xs"
-                  >
-                    {messages.map((msg, idx) => (
-                      <div
-                        key={idx}
-                        className={`flex gap-2.5 max-w-[85%] ${
-                          msg.role === "user" ? "ml-auto flex-row-reverse" : ""
-                        }`}
-                      >
-                        <div
-                          className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 ${
-                            msg.role === "user"
-                              ? "bg-primary/20 text-primary"
-                              : "bg-slate-800 text-slate-300 border border-border/30"
-                          }`}
-                        >
-                          {msg.role === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
-                        </div>
-                        <div
-                          className={`p-2.5 rounded-2xl leading-relaxed whitespace-pre-line ${
-                            msg.role === "user"
-                              ? "bg-primary text-primary-foreground rounded-tr-none"
-                              : "bg-slate-900/60 text-muted-foreground border border-border/20 rounded-tl-none"
-                          }`}
-                        >
-                          {msg.content}
-                        </div>
-                      </div>
-                    ))}
-
-                    {chatLoading && (
-                      <div className="flex gap-2.5 max-w-[85%]">
-                        <div className="h-6 w-6 rounded-full bg-slate-800 text-slate-300 border border-border/30 flex items-center justify-center flex-shrink-0">
-                          <Bot className="h-3 w-3 animate-pulse" />
-                        </div>
-                        <div className="p-2.5 bg-slate-900/60 border border-border/20 rounded-2xl rounded-tl-none flex items-center gap-1.5 text-muted-foreground">
-                          <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                          <span className="text-[10px] animate-pulse">Analyzing report data...</span>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Input Form */}
-                  <form
-                    onSubmit={handleSendChatMessage}
-                    className="p-3 border-t border-border/20 bg-slate-900/30 flex gap-2 items-center"
-                  >
-                    <input
-                      type="text"
-                      value={chatInput}
-                      onChange={(e) => setChatInput(e.target.value)}
-                      placeholder="Ask me something about the data..."
-                      disabled={chatLoading}
-                      className="flex-1 bg-slate-950/40 border border-border/30 rounded-lg px-3 py-1.5 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/60 disabled:opacity-50"
-                    />
-                    <Button
-                      type="submit"
-                      disabled={!chatInput.trim() || chatLoading}
-                      size="icon"
-                      className="h-8 w-8 rounded-lg flex-shrink-0 bg-primary hover:bg-primary/95 text-primary-foreground"
-                    >
-                      <Send className="h-3.5 w-3.5" />
-                    </Button>
-                  </form>
-                </CardContent>
-              </Card>
+              </div>
             </div>
           </div>
         </TabsContent>

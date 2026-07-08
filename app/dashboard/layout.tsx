@@ -108,7 +108,7 @@ export default async function DashboardLayout({
         <header className="h-16 border-b border-border/30 px-6 flex items-center justify-between glass-nav sticky top-0 z-40">
           <div className="flex items-center gap-4">
             <h1 className="font-semibold text-lg text-foreground md:block hidden">
-              Welcome back, {user.name?.split(" ")[0]}
+              Welcome Back
             </h1>
             <div className="md:hidden flex items-center gap-2">
               <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center text-primary-foreground font-bold">

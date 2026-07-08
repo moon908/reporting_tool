@@ -17,5 +17,5 @@ export const handlers = {
   POST: async () => new Response("Bypassed NextAuth POST Handlers"),
 };
 
-export const signIn = async () => {};
-export const signOut = async () => {};
+export const signIn = async (...args: any[]) => {};
+export const signOut = async (...args: any[]) => {};

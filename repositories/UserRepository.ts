@@ -30,7 +30,7 @@ export class UserRepository {
     });
   }
 
-  static async create(data: Prisma.UserCreateInput) {
+  static async create(data: Prisma.UserCreateInput | Prisma.UserUncheckedCreateInput) {
     return db.user.create({
       data,
       include: {
@@ -40,7 +40,7 @@ export class UserRepository {
     });
   }
 
-  static async update(id: string, data: Prisma.UserUpdateInput) {
+  static async update(id: string, data: Prisma.UserUpdateInput | Prisma.UserUncheckedUpdateInput) {
     return db.user.update({
       where: { id },
       data,

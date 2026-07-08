@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useActionState, useEffect, useState } from "react";
+import { Suspense, useActionState, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
@@ -18,7 +18,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function LoginPage() {
+function LoginContent() {
   const searchParams = useSearchParams();
   const showSuccess = searchParams.get("registered") === "true";
   
@@ -150,5 +150,20 @@ export default function LoginPage() {
         </CardFooter>
       </form>
     </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <Card className="glass-card shadow-xl border-border/40">
+        <CardHeader>
+          <CardTitle className="text-xl">Loading...</CardTitle>
+          <CardDescription>Preparing security session</CardDescription>
+        </CardHeader>
+      </Card>
+    }>
+      <LoginContent />
+    </Suspense>
   );
 }

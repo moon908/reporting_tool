@@ -68,7 +68,7 @@ export default async function DashboardPage() {
       CLEANING: { name: "Cleaning Data", color: "#3b82f6" },
     };
 
-    statusData = statusGroups.map((group) => {
+    statusData = statusGroups.map((group: any) => {
       const statusInfo = statusMap[group.status as keyof typeof statusMap] || {
         name: group.status,
         color: "#64748b",

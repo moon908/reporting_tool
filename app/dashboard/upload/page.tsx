@@ -71,17 +71,17 @@ export default function IngestionPage() {
       if (ext === "csv") {
         const lines = text.split(/\r?\n/).slice(0, 6);
         if (lines.length > 0) {
-          const headers = lines[0].split(",").map((h) => h.trim());
-          const rows = lines.slice(1).map((line) => {
+          const headers = lines[0].split(",").map((h: string) => h.trim());
+          const rows = lines.slice(1).map((line: string) => {
             const cells = line.split(",");
             const row: any = {};
-            headers.forEach((h, idx) => {
+            headers.forEach((h: string, idx: number) => {
               row[h] = cells[idx] || "";
             });
             return row;
           });
           setPreviewHeaders(headers);
-          setPreviewRows(rows.filter((r) => Object.values(r).some(v => v !== "")));
+          setPreviewRows(rows.filter((r: any) => Object.values(r).some(v => v !== "")));
         }
       } else if (ext === "json") {
         try {
@@ -238,7 +238,7 @@ export default function IngestionPage() {
                   <div className="border border-destructive/25 rounded-lg p-3 bg-destructive/5 text-[11px] space-y-1">
                     <p className="font-semibold text-destructive">Data Schema Errors Details:</p>
                     <ul className="list-disc pl-4 space-y-0.5 text-muted-foreground max-h-36 overflow-y-auto">
-                      {validationErrors.map((err, idx) => (
+                      {validationErrors.map((err: string, idx: number) => (
                         <li key={idx}>{err}</li>
                       ))}
                     </ul>
@@ -266,7 +266,7 @@ export default function IngestionPage() {
                 <table className="min-w-full text-[10px] text-left">
                   <thead>
                     <tr className="border-b border-border/40 text-muted-foreground font-semibold bg-muted/30">
-                      {previewHeaders.map((header) => (
+                      {previewHeaders.map((header: string) => (
                         <th key={header} className="p-1 px-2 uppercase truncate max-w-[100px]">
                           {header}
                         </th>
@@ -274,9 +274,9 @@ export default function IngestionPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {previewRows.map((row, idx) => (
+                    {previewRows.map((row: any, idx: number) => (
                       <tr key={idx} className="border-b border-border/20">
-                        {previewHeaders.map((header) => (
+                        {previewHeaders.map((header: string) => (
                           <td key={header} className="p-1.5 px-2 truncate max-w-[100px] text-muted-foreground">
                             {row[header] !== undefined ? String(row[header]) : ""}
                           </td>

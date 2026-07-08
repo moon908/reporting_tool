@@ -102,8 +102,8 @@ export async function GET(req: NextRequest) {
         // Parse recipients list
         const recipientsList = schedule.recipients
           .split(",")
-          .map((r) => r.trim())
-          .filter((r) => r.length > 0);
+          .map((r: string) => r.trim())
+          .filter((r: string) => r.length > 0);
 
         // Send Email
         const emailSent = await EmailService.sendReportEmail({
@@ -161,7 +161,7 @@ export async function GET(req: NextRequest) {
           data: {
             nextRun,
           },
-        }).catch((dbErr) => console.error("Failed to update schedule fail-safe nextRun:", dbErr));
+        }).catch((dbErr: any) => console.error("Failed to update schedule fail-safe nextRun:", dbErr));
 
         // Create failure notification
         await db.notification.create({
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
             type: "ERROR",
             userId: schedule.createdById,
           },
-        }).catch((dbErr) => console.error("Failed to create error notification:", dbErr));
+        }).catch((dbErr: any) => console.error("Failed to create error notification:", dbErr));
       }
     }
 

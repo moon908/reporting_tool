@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExportService } from "@/services/ExportService";
+import { chatWithAIAboutReportAction } from "@/actions/reportActions";
 import { motion } from "framer-motion";
 import {
   Download,
@@ -11,8 +12,13 @@ import {
   FileText,
   Sparkles,
   TrendingUp,
+  Send,
+  Bot,
+  User,
+  MessageSquare,
+  Loader2,
 } from "lucide-react";
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   Bar,
   BarChart,
@@ -59,6 +65,53 @@ interface ReportViewProps {
 
 export default function ReportView({ report }: ReportViewProps) {
   const [downloading, setDownloading] = useState(false);
+  const [messages, setMessages] = useState<Array<{ role: "user" | "assistant"; content: string }>>([
+    {
+      role: "assistant",
+      content: `Hello! I am your AI analyst. Ask me any questions about the "${report.title}" report, such as key findings, potential risks, trends, or anomalous outliers.`,
+    },
+  ]);
+  const [chatInput, setChatInput] = useState("");
+  const [chatLoading, setChatLoading] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [messages, chatLoading]);
+
+  const handleSendChatMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || chatLoading) return;
+
+    const userMsg = { role: "user" as const, content: chatInput.trim() };
+    const newMessages = [...messages, userMsg];
+    setMessages(newMessages);
+    setChatInput("");
+    setChatLoading(true);
+
+    try {
+      const result = await chatWithAIAboutReportAction(report.id, newMessages);
+      if (result.success && result.answer) {
+        setMessages([...newMessages, { role: "assistant", content: result.answer }]);
+      } else {
+        setMessages([
+          ...newMessages,
+          { role: "assistant", content: `Sorry, I encountered an issue: ${result.error || "Unknown error"}` },
+        ]);
+      }
+    } catch (err: any) {
+      setMessages([
+        ...newMessages,
+        { role: "assistant", content: "Failed to communicate with AI analyst. Please try again." },
+      ]);
+    } finally {
+      setChatLoading(false);
+    }
+  };
+
   const dataset = report.dataset;
   const processedData = dataset?.processedData;
   const insights = processedData?.insights;
@@ -270,6 +323,87 @@ export default function ReportView({ report }: ReportViewProps) {
                   </CardContent>
                 </Card>
               )}
+
+              {/* AI Conversation Block */}
+              <Card className="glass-card border-border/40 shadow-sm flex flex-col h-[400px]">
+                <CardHeader className="pb-3 border-b border-border/20 flex flex-row items-center gap-2 space-y-0 py-4">
+                  <MessageSquare className="h-4 w-4 text-primary" />
+                  <div>
+                    <CardTitle className="text-sm font-semibold tracking-tight">AI Data Chat</CardTitle>
+                    <CardDescription className="text-[10px]">Ask questions about this report</CardDescription>
+                  </div>
+                </CardHeader>
+                <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
+                  {/* Message Container */}
+                  <div
+                    ref={chatScrollRef}
+                    className="flex-1 overflow-y-auto p-4 space-y-3 scrollbar-thin text-xs"
+                  >
+                    {messages.map((msg, idx) => (
+                      <div
+                        key={idx}
+                        className={`flex gap-2.5 max-w-[85%] ${
+                          msg.role === "user" ? "ml-auto flex-row-reverse" : ""
+                        }`}
+                      >
+                        <div
+                          className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 ${
+                            msg.role === "user"
+                              ? "bg-primary/20 text-primary"
+                              : "bg-slate-800 text-slate-300 border border-border/30"
+                          }`}
+                        >
+                          {msg.role === "user" ? <User className="h-3 w-3" /> : <Bot className="h-3 w-3" />}
+                        </div>
+                        <div
+                          className={`p-2.5 rounded-2xl leading-relaxed whitespace-pre-line ${
+                            msg.role === "user"
+                              ? "bg-primary text-primary-foreground rounded-tr-none"
+                              : "bg-slate-900/60 text-muted-foreground border border-border/20 rounded-tl-none"
+                          }`}
+                        >
+                          {msg.content}
+                        </div>
+                      </div>
+                    ))}
+
+                    {chatLoading && (
+                      <div className="flex gap-2.5 max-w-[85%]">
+                        <div className="h-6 w-6 rounded-full bg-slate-800 text-slate-300 border border-border/30 flex items-center justify-center flex-shrink-0">
+                          <Bot className="h-3 w-3 animate-pulse" />
+                        </div>
+                        <div className="p-2.5 bg-slate-900/60 border border-border/20 rounded-2xl rounded-tl-none flex items-center gap-1.5 text-muted-foreground">
+                          <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                          <span className="text-[10px] animate-pulse">Analyzing report data...</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Input Form */}
+                  <form
+                    onSubmit={handleSendChatMessage}
+                    className="p-3 border-t border-border/20 bg-slate-900/30 flex gap-2 items-center"
+                  >
+                    <input
+                      type="text"
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder="Ask me something about the data..."
+                      disabled={chatLoading}
+                      className="flex-1 bg-slate-950/40 border border-border/30 rounded-lg px-3 py-1.5 text-xs text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/60 disabled:opacity-50"
+                    />
+                    <Button
+                      type="submit"
+                      disabled={!chatInput.trim() || chatLoading}
+                      size="icon"
+                      className="h-8 w-8 rounded-lg flex-shrink-0 bg-primary hover:bg-primary/95 text-primary-foreground"
+                    >
+                      <Send className="h-3.5 w-3.5" />
+                    </Button>
+                  </form>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </TabsContent>

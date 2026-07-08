@@ -336,3 +336,82 @@ async function parseExcel(buffer: Buffer): Promise<any[]> {
 
   return rows;
 }
+
+/**
+ * Server action to chat with AI about a specific report
+ */
+export async function chatWithAIAboutReportAction(
+  reportId: string,
+  history: Array<{ role: "user" | "assistant"; content: string }>
+) {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return { success: false, error: "Authentication required." };
+  }
+
+  try {
+    let report: any = null;
+
+    if (reportId.startsWith("demo")) {
+      report = {
+        title: "Sales Q2 Progress Summary",
+        description: "Automated business performance analysis (Simulation Mode)",
+        kpis: {
+          totalRecords: 6,
+          numericColumnsCount: 2,
+          anomalyCount: 2,
+          totalRevenue: 22800,
+          totalCost: 9200,
+          netProfit: 13600,
+          profitMarginPercentage: 59.65,
+        },
+        statistics: {
+          revenue: { count: 6, sum: 22800, mean: 3800, median: 1350, min: 1000, max: 15000 },
+          cost: { count: 6, sum: 9200, mean: 1533, median: 850, min: 600, max: 5000 },
+        },
+        anomalies: [
+          { rowIndex: 3, column: "revenue", value: 15000, zScore: 2.23 },
+          { rowIndex: 3, column: "cost", value: 5000, zScore: 2.22 },
+        ]
+      };
+    } else {
+      const reportDb = await db.report.findUnique({
+        where: { id: reportId },
+        include: {
+          dataset: {
+            include: {
+              processedData: true,
+            },
+          },
+        },
+      });
+
+      if (!reportDb) {
+        return { success: false, error: "Report not found." };
+      }
+
+      const pData = reportDb.dataset?.processedData;
+      report = {
+        title: reportDb.title,
+        description: reportDb.description,
+        kpis: pData?.kpis ? JSON.parse(pData.kpis) : {},
+        statistics: pData?.statistics ? JSON.parse(pData.statistics) : {},
+        anomalies: pData?.anomalies ? JSON.parse(pData.anomalies) : [],
+      };
+    }
+
+    const answer = await AIService.chatAboutReport({
+      reportTitle: report.title,
+      reportDescription: report.description,
+      kpis: report.kpis,
+      statistics: report.statistics,
+      anomalies: report.anomalies,
+      history,
+    });
+
+    return { success: true, answer };
+  } catch (error: any) {
+    console.error("Failed to chat with AI:", error);
+    return { success: false, error: error.message || "Failed to process chat request." };
+  }
+}

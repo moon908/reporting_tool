@@ -171,4 +171,60 @@ export class AIService {
       isMock: true,
     };
   }
+
+  static async chatAboutReport(params: {
+    reportTitle: string;
+    reportDescription: string | null;
+    kpis: Record<string, any>;
+    statistics: Record<string, any>;
+    anomalies: any[];
+    history: Array<{ role: "user" | "assistant"; content: string }>;
+  }): Promise<string> {
+    const groq = this.getGroqClient();
+
+    if (!groq) {
+      console.warn("GROQ_API_KEY not configured. Falling back to mock chat response.");
+      const lastMsg = params.history[params.history.length - 1]?.content || "";
+      return `[Mock Response] I'm running in demo/mock mode because the GROQ_API_KEY is not configured. You asked: "${lastMsg}". The report "${params.reportTitle}" has ${params.kpis.totalRecords || 0} records, showing a net profit of $${params.kpis.netProfit?.toLocaleString() ?? "N/A"}. Let me know if you configure the API key to chat with the real Llama model!`;
+    }
+
+    try {
+      const context = `
+        You are a helpful and expert AI business analyst.
+        The user is viewing a report dataset details:
+        Report Title: "${params.reportTitle}"
+        Report Description: "${params.reportDescription || ""}"
+
+        KPI Metrics:
+        ${JSON.stringify(params.kpis, null, 2)}
+
+        Descriptive Statistics:
+        ${JSON.stringify(params.statistics, null, 2)}
+
+        Anomalous Outliers:
+        ${JSON.stringify(params.anomalies, null, 2)}
+
+        Answer the user's questions clearly, concisely, and professionally, using the data provided.
+        Ground your answers strictly in the factual details of the report. If a request is out of context, gently redirect the user back to the data.
+      `;
+
+      const response = await groq.chat.completions.create({
+        model: "llama-3.3-70b-versatile",
+        messages: [
+          { role: "system", content: context },
+          ...params.history.map((msg) => ({
+            role: msg.role === "user" ? ("user" as const) : ("assistant" as const),
+            content: msg.content,
+          })),
+        ],
+        temperature: 0.5,
+        max_tokens: 600,
+      });
+
+      return response.choices[0]?.message?.content || "No message returned from Groq.";
+    } catch (err: any) {
+      console.error("Groq chat service failed:", err);
+      return `I encountered an error communicating with the AI service: ${err.message || err}`;
+    }
+  }
 }
